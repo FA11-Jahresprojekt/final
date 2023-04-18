@@ -10,5 +10,6 @@ SCREEN_WIDTH = 1080
 
 # TITLES
 LAUNCHER_TITLE = "Launcher"
+GAME_TITLE = "Spielauswahl"
 CHESS_TITLE = "Chess"
 DAME_TITLE = "Dame"

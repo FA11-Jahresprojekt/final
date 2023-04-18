@@ -11,8 +11,14 @@ class Renderer:
         self.screen = screen
 
         self.score_background_image = pygame.image.load(Variables.DIR_IMAGES + "score_background.png")
+        self.button_quad_image = pygame.image.load(Variables.DIR_IMAGES + "button_quad.png")
+        self.button_quad_selected_image = pygame.image.load(Variables.DIR_IMAGES + "button_quad_selected.png")
         self.background_image = pygame.image.load(Variables.DIR_IMAGES + "background.png")
         self.user_image = pygame.image.load(Variables.DIR_IMAGES + "profile_default.png")
+        self.undo_image = pygame.image.load(Variables.DIR_IMAGES + "undo_button.png")
+        self.button_wide_image = pygame.image.load(Variables.DIR_IMAGES + "button_wide.png")
+        self.button_image = pygame.image.load(Variables.DIR_IMAGES + "button.png")
+        self.score_card = pygame.image.load(Variables.DIR_IMAGES + "score_card.png")
 
     def draw_background(self):
         self.screen.blit(self.background_image, (0, 0))
@@ -32,9 +38,73 @@ class Renderer:
 
         rect = pygame.draw.rect(self.screen, (0, 0, 0), (x - offset, y - offset, widthX + offset * 2, widthY + offset * 2), border_radius=offset * 2)
         self.screen.blit(pygame.transform.scale(image, (widthX, widthY)), (x, y))
+
         self.screen.blit(pygame.transform.scale(title_image, (widthX, 40)), (x, y - 25))
 
         return rect
+
+    def draw_game_preview(self, title_image, image, x, y, difficulty, widthX=320, widthY=220):
+        offset = 4
+        buttons = []
+
+        pygame.draw.rect(self.screen, (0, 0, 0), (x - offset, y - offset, widthX + offset * 2, widthY + offset * 2), border_radius=offset * 2)
+        self.screen.blit(pygame.transform.scale(image, (widthX, widthY)), (x, y))
+
+        self.screen.blit(pygame.transform.scale(title_image, (400, 48)), (x, y + widthY + 10))
+
+        difficulties = 5
+
+        label = self.get_font(30, True).render("SCHWIERIGKEIT & STATS", True, COLOR_WHITE)
+        self.screen.blit(label, (x + widthX + 40 + (500 / 2) - (label.get_width() / 2), y))
+
+        for i in range(difficulties):
+            size = 87
+            selected = i == difficulty - 1
+            button = self.draw_quad_button(x + widthX + 40 + i * (size + 10), y + 42, size, size, str(i + 1), selected, 50)
+            buttons.append({'rect': button, 'name': 'difficulty_' + str(i + 1)})
+
+        button = self.screen.blit(pygame.transform.scale(self.button_image, (920, 123)), (x, Variables.SCREEN_HEIGHT - 150))
+        label = self.get_font(45).render("SPIELEN", True, COLOR_WHITE)
+        self.screen.blit(label, (x + (920 / 2) - (label.get_width() / 2), Variables.SCREEN_HEIGHT - 150 + (123 / 2) - (label.get_height() / 2)))
+
+        buttons.append({'rect': button, 'name': 'play'})
+
+        return buttons
+
+    def draw_score_card(self, x, y, width, height, title, value):
+        self.screen.blit(pygame.transform.scale(self.score_card, (width, height)), (x, y))
+
+        # calculate font size based on width
+        font_size = 20
+        while self.get_font(font_size, True).render(title, True, COLOR_WHITE).get_width() > width - 22:
+            font_size -= 1
+
+        if " " in title:
+            texts = title.split(" ")
+            font_size = 12
+        else:
+            texts = [title]
+
+        for i in range(len(texts)):
+            title_text = self.get_font(font_size, True).render(texts[i], True, COLOR_WHITE)
+            self.screen.blit(title_text, (x + (width / 2) - (title_text.get_width() / 2) + 2, y + (height - 18) - (title_text.get_height() / 2) - 10 * (len(texts) - 1) + 13 * i))
+
+        value_text = self.get_font(45, True).render(value, True, COLOR_WHITE)
+        self.screen.blit(value_text, (x + (width / 2) - (value_text.get_width() / 2) + 3, y + (height / 2) - (value_text.get_height() / 2) - 8))
+
+        return pygame.Rect(x, y, width, height)
+
+    def draw_quad_button(self, x, y, width, height, text, selected=False, font_size=30):
+        if selected:
+            self.screen.blit(pygame.transform.scale(self.button_quad_selected_image, (width, height)), (x, y))
+        else:
+            self.screen.blit(pygame.transform.scale(self.button_quad_image, (width, height)), (x, y))
+
+        text = self.get_font(font_size).render(text, True, COLOR_WHITE)
+
+        self.screen.blit(text, (x + (width / 2) - (text.get_width() / 2) + 3, y + (height / 2) - (text.get_height() / 2)))
+
+        return pygame.Rect(x, y, width, height)
 
     def draw_user(self, username, x, y):
         # Load and scale profile image
@@ -59,13 +129,21 @@ class Renderer:
         self.screen.blit(masked_profile_image, (profile_image_pos_x, profile_image_pos_y))
         self.screen.blit(username_text, (username_pos_x, username_pos_y))
 
-    def draw_heading(self, header, username):
+    def draw_heading(self, header, username, back=False):
         pygame.Surface.fill(self.screen, COLOR_BLACK90, rect=(0, 0, 1080, 60))
         pygame.Surface.fill(self.screen, COLOR_BLACK80, rect=(0, 60, 1080, 3))
         self.draw_user(username, Variables.SCREEN_WIDTH - 20, 16)
 
-        heading = self.get_font(26, True).render("Spielesammlung", True, COLOR_WHITE)
-        self.screen.blit(heading, (20, 16))
+        heading = self.get_font(26, True).render(header, True, COLOR_WHITE)
+
+        add = 0
+        backBtn = None
+        if back:
+            add = 40
+            backBtn = self.screen.blit(pygame.transform.scale(self.undo_image, (20, 20)), (25, 21))
+
+        self.screen.blit(heading, (20 + add, 16))
+        return backBtn
 
     def draw_highscore_list(self, game, header_image, x, y):
         width = 240

@@ -4,6 +4,7 @@ from pygame import mixer
 import Util
 import Variables
 from Database import Database
+from GuiGameMenu import GuiGameMenu
 from Renderer import Renderer
 
 pygame.init()
@@ -36,27 +37,35 @@ class GuiMainMenu:
         self.renderer = Renderer(SCREEN)
 
         self.buttons = []
+        self.running = True
 
         self.dame_difficulty = 3
         self.bauernschach_difficulty = 3
 
     def run(self):
-        running = True
         clock.tick(60)
 
         self.draw_menu()
 
-        while running:
+        while self.running:
             for event in pygame.event.get():
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     for button in self.buttons:
                         if button['rect'].collidepoint(pygame.mouse.get_pos()):
                             self.on_click(button['name'])
                 if event.type == pygame.QUIT:
-                    running = False
+                    self.running = False
 
     def on_click(self, name):
         mixer.music.play()
+
+        if name == "btn.bauernschach":
+            GuiGameMenu(self, SCREEN, BAUERNSCHACH_HEADER_IMAGE, BAUERNSCHACH_IMAGE, "Bauernschach").run()
+            self.running = False
+
+        if name == "btn.dame":
+            GuiGameMenu(self, SCREEN, DAME_HEADER_IMAGE, DAME_IMAGE, "Dame").run()
+            self.running = False
 
         if "_difficulty_" in name:
             difficulty = int(name.split("_")[2])
