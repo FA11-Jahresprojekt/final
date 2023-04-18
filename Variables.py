@@ -13,3 +13,6 @@ LAUNCHER_TITLE = "Launcher"
 GAME_TITLE = "Spielauswahl"
 CHESS_TITLE = "Chess"
 DAME_TITLE = "Dame"
+
+# PLAYER ID
+PLAYER_ID = None # {'id': <id>, 'name': <name>}
