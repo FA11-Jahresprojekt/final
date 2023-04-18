@@ -7,6 +7,7 @@ import Util
 import Variables
 from Database import Database
 from GuiGameMenu import GuiGameMenu
+from GuiLogin import GuiLogin
 from Renderer import Renderer
 
 pygame.init()
@@ -40,17 +41,24 @@ class GuiMainMenu:
         self.db = Database.getInstance()
         self.renderer = Renderer(SCREEN)
         self.splash = True
+        self.running = True
 
         self.buttons = []
-        self.running = True
+        self.gui_login = None
 
         self.dame_difficulty = 3
         self.bauernschach_difficulty = 3
+
+        if Variables.PLAYER_ID == None:
+            self.gui_login = GuiLogin(self)
+            self.gui_login.runLoginScreen()
+            self.running = False
 
     def run(self):
         clock.tick(60)
 
         if self.splash:
+            mixer.init()
             mixer.music.load(MUSIC_BASE_DIR + "pling.mp3")
             mixer.music.play()
             self.splash = False
@@ -78,6 +86,11 @@ class GuiMainMenu:
             GuiGameMenu(self, SCREEN, BAUERNSCHACH_HEADER_IMAGE, BAUERNSCHACH_IMAGE, "Bauernschach").run()
             self.running = False
 
+        if name == "logout":
+            Variables.PLAYER_ID = None
+            self.gui_login.runLoginScreen()
+            self.running = False
+
         if name == "btn.dame":
             GuiGameMenu(self, SCREEN, DAME_HEADER_IMAGE, DAME_IMAGE, "Dame").run()
             self.running = False
@@ -96,7 +109,9 @@ class GuiMainMenu:
     def draw_menu(self):
 
         self.renderer.draw_background()
-        self.renderer.draw_heading("Spielesammlung", "Admin")
+        headerBtns = self.renderer.draw_heading("Spielesammlung", Variables.PLAYER_ID['name'])
+
+        self.buttons = Util.append_array_to_array(self.buttons, headerBtns)
 
         buttonBauernschach = self.renderer.draw_game_card(BAUERNSCHACH_HEADER_IMAGE, BAUERNSCHACH_IMAGE, 80, 160)
         buttonDame = self.renderer.draw_game_card(DAME_HEADER_IMAGE, DAME_IMAGE, 80, 420)

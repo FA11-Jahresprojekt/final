@@ -56,6 +56,11 @@ class GuiGameMenu:
             self.difficulty = int(name.split("_")[1])
             self.draw_menu()
 
+        if name == "logout":
+            Variables.PLAYER_ID = None
+            self.guiFrom.gui_login.runLoginScreen()
+            self.running = False
+
         if name == "back":
             self.guiFrom.run()
             self.running = False
@@ -63,9 +68,9 @@ class GuiGameMenu:
     def draw_menu(self):
         self.buttons.clear()
         self.renderer.draw_background()
-        backBtn = self.renderer.draw_heading(self.gameName, "Admin", True)
+        headerBtns = self.renderer.draw_heading(self.gameName, Variables.PLAYER_ID['name'], True)
 
-        self.buttons.append({'name': 'back', 'rect': backBtn})
+        self.buttons = Util.append_array_to_array(self.buttons, headerBtns)
 
         dButtons = self.renderer.draw_game_preview(self.headerImage, self.gameImage, 80, 160, self.difficulty, 400, 275)
 

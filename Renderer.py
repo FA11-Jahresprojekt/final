@@ -129,10 +129,14 @@ class Renderer:
         self.screen.blit(masked_profile_image, (profile_image_pos_x, profile_image_pos_y))
         self.screen.blit(username_text, (username_pos_x, username_pos_y))
 
+        return pygame.Rect(profile_image_pos_x, profile_image_pos_y, 30 + username_text.get_width(), 30)
+
     def draw_heading(self, header, username, back=False):
+        buttons = []
+
         pygame.Surface.fill(self.screen, COLOR_BLACK90, rect=(0, 0, 1080, 60))
         pygame.Surface.fill(self.screen, COLOR_BLACK80, rect=(0, 60, 1080, 3))
-        self.draw_user(username, Variables.SCREEN_WIDTH - 20, 16)
+        logout = self.draw_user(username, Variables.SCREEN_WIDTH - 20, 16)
 
         heading = self.get_font(26, True).render(header, True, COLOR_WHITE)
 
@@ -143,7 +147,12 @@ class Renderer:
             backBtn = self.screen.blit(pygame.transform.scale(self.undo_image, (20, 20)), (25, 21))
 
         self.screen.blit(heading, (20 + add, 16))
-        return backBtn
+
+        buttons.append({'rect': logout, 'name': 'logout'})
+        if back:
+            buttons.append({'rect': backBtn, 'name': 'back'})
+
+        return buttons
 
     def draw_highscore_list(self, game, header_image, x, y):
         width = 240
