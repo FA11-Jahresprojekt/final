@@ -1,3 +1,5 @@
+import time
+
 import pygame
 from pygame import mixer
 
@@ -31,10 +33,13 @@ BAUERNSCHACH_HEADER_IMAGE = pygame.image.load(Variables.DIR_IMAGES + "headings/b
 DAME_IMAGE = pygame.image.load(Variables.DIR_IMAGES + "games/dame.png")
 DAME_HEADER_IMAGE = pygame.image.load(Variables.DIR_IMAGES + "headings/dame.png")
 
+IMAGE_GROUP = pygame.image.load(Variables.DIR_IMAGES + "group.png")
+
 class GuiMainMenu:
     def __init__(self):
         self.db = Database.getInstance()
         self.renderer = Renderer(SCREEN)
+        self.splash = True
 
         self.buttons = []
         self.running = True
@@ -44,6 +49,16 @@ class GuiMainMenu:
 
     def run(self):
         clock.tick(60)
+
+        if self.splash:
+            mixer.music.load(MUSIC_BASE_DIR + "pling.mp3")
+            mixer.music.play()
+            self.splash = False
+            self.renderer.draw_background()
+            SCREEN.blit(IMAGE_GROUP, (Variables.SCREEN_WIDTH / 2 - IMAGE_GROUP.get_width() / 2, Variables.SCREEN_HEIGHT / 2 - IMAGE_GROUP.get_height() / 2))
+            pygame.display.flip()
+            time.sleep(2)
+            mixer.music.load(MUSIC_BASE_DIR + "click.ogg")
 
         self.draw_menu()
 
