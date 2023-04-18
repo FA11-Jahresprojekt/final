@@ -86,3 +86,7 @@ class GuiGameMenu:
         self.renderer.draw_score_card(x + widthX + 40 + (size + 10) * 2, y + 150, size, size, "LOST GAMES", "0")
         self.renderer.draw_score_card(x + widthX + 40 + (size + 10) * 3, y + 150, size, size, "CANCELLED GAMES", "0")
         self.renderer.draw_score_card(x + widthX + 40 + (size + 10) * 4, y + 150, size, size, "DESTROYED PAWNS", "0")
+
+    def getOwnScore(self, gameName, difficulty, playerID):
+        ownScore = self.db.getGamesSummaryForGameAndDifficultyAndPlayerID(gameName, difficulty, playerID)
+        return ownScore
