@@ -3,6 +3,7 @@ import time
 import pygame
 from pygame import mixer
 
+from Database import Database
 from game import BauernSchach, Dame, MoveAction, MiniMaxKI, RandomKi
 
 # Initialize pygame
@@ -34,13 +35,10 @@ IMAGE_BASE_DIR = "assets/image/"
 IMAGE_WIN_LABEL = pygame.image.load(IMAGE_BASE_DIR + 'win_label.png')
 IMAGE_LOSE_LABEL = pygame.image.load(IMAGE_BASE_DIR + 'lose_label.png')
 IMAGE_FAVICON = pygame.image.load(IMAGE_BASE_DIR + 'favicon.png')
-IMAGE_HEADING = pygame.image.load(IMAGE_BASE_DIR + 'heading.png')
 IMAGE_ICON_HELP = pygame.image.load(IMAGE_BASE_DIR + 'question.png')
 IMAGE_ICON_EXIT = pygame.image.load(IMAGE_BASE_DIR + 'exit.png')
 IMAGE_BACKGROUND = pygame.image.load(IMAGE_BASE_DIR + 'background.png')
 IMAGE_BUTTON = pygame.image.load(IMAGE_BASE_DIR + 'button.png')
-IMAGE_WHITE_PAWN = pygame.image.load(IMAGE_BASE_DIR + 'pawn_white.png')
-IMAGE_BLACK_PAWN = pygame.image.load(IMAGE_BASE_DIR + 'pawn_black.png')
 IMAGE_HEADING_GRUPPE = pygame.image.load(IMAGE_BASE_DIR + 'heading_gruppe.png')
 IMAGE_GAME_BACKGROUND = pygame.image.load(IMAGE_BASE_DIR + 'game_background.png')
 IMAGE_STATS_BACKGROUND = pygame.image.load(IMAGE_BASE_DIR + 'stats_background.png')
@@ -53,12 +51,20 @@ disable_deselect = False
 
 class Engine:
     def __init__(self, screen, mainMenu, difficulty, game):
+        self.db = Database.getInstance()
+
         if game == 'Bauernschach':
             self.game = BauernSchach(difficulty)
             DAME_TEXTURES = False
+            self.image_heading = pygame.image.load(IMAGE_BASE_DIR + 'heading.png')
+            self.image_black_pawn = pygame.image.load(IMAGE_BASE_DIR + 'pawn_black.png')
+            self.image_white_pawn = pygame.image.load(IMAGE_BASE_DIR + 'pawn_white.png')
         else:
             self.game = Dame(difficulty)
             DAME_TEXTURES = True
+            self.image_heading = pygame.image.load(IMAGE_BASE_DIR + 'heading_dame.png')
+            self.image_black_pawn = pygame.image.load(IMAGE_BASE_DIR + 'pawn_dame_black.png')
+            self.image_white_pawn = pygame.image.load(IMAGE_BASE_DIR + 'pawn_dame_white.png')
 
         if difficulty == 0:
             self.ki = RandomKi(self.game)
@@ -70,13 +76,15 @@ class Engine:
         self.screen = screen
         self.mainMenu = mainMenu
         self.running = True
+        self.difficulty = str(difficulty + 1)
+        self.gameName = game
         self.quit = False
 
     def draw_heading(self):
         leftover = SCREEN_HEIGHT - (COLUMNS * SQUARE_SIZE)
         offset = 15
 
-        self.screen.blit(pygame.transform.scale(IMAGE_HEADING, (420, 46)), (PADDING - offset, leftover / 2 - offset))
+        self.screen.blit(pygame.transform.scale(self.image_heading, (420, 46)), (PADDING - offset, leftover / 2 - offset))
 
 
     def draw_pawn(self, xField, yField, color):
@@ -86,9 +94,9 @@ class Engine:
         y = yField * SQUARE_SIZE + leftover / 2 + PADDING
 
         if color == "white":
-            self.screen.blit(IMAGE_WHITE_PAWN, (x, y))
+            self.screen.blit(self.image_white_pawn, (x, y))
         elif color == "black":
-            self.screen.blit(IMAGE_BLACK_PAWN, (x, y))
+            self.screen.blit(self.image_black_pawn, (x, y))
 
 
     def draw_help_button(self):
@@ -282,7 +290,7 @@ class Engine:
         x = PADDING
         y = ROWS * SQUARE_SIZE + leftover / 2 + PADDING + 20
 
-        difficulty = arialBold.render("Schwierigkeit: Einfach", True, (255, 255, 255))
+        difficulty = arialBold.render("Schwierigkeit: " + self.difficulty, True, (255, 255, 255))
 
         self.screen.blit(difficulty, (x, y))
 
@@ -349,12 +357,9 @@ class Engine:
         pygame.draw.rect(shape_surf, color, shape_surf.get_rect())
         surface.blit(shape_surf, rect)
 
-
-    def get_leaderboard(self):
-        return [{"username": "Alice", "score": 104}, {"username": "Bob", "score": 20}, {"username": "Charlie", "score": 15},
-                {"username": "Alice", "score": 104}, {"username": "Bob", "score": 20}, {"username": "Charlie", "score": 15},
-                {"username": "Alice", "score": 104}, {"username": "Bob", "score": 20}, {"username": "Charlie", "score": 15},
-                {"username": "Alice", "score": 104}, {"username": "Bob", "score": 20}, {"username": "Charlie", "score": 15}]
+    def getHighscores(self, game_type, difficulty, player_count):
+        bestPlayers = self.db.getTopPlayersForGameAndDifficulty(game_type, difficulty, player_count)
+        return bestPlayers
 
 
     def draw_leaderboard(self):
@@ -365,15 +370,15 @@ class Engine:
 
         self.screen.blit(IMAGE_LEADERBOARD_BACKGROUND, (x - minus_padding, y - minus_padding))
 
-        leaderboard = self.get_leaderboard()
 
+        leaderboard = self.getHighscores(self.gameName, int(self.difficulty), 10)
         for i in range(len(leaderboard)):
             if i > 10:
                 break
 
             place = arialBold.render(str(i + 1) + ".", True, (255, 255, 255))
-            username = arialBold.render(leaderboard[i]["username"], True, (255, 255, 255))
-            score = arial.render(str(leaderboard[i]["score"]), True, (255, 255, 255))
+            username = arialBold.render(leaderboard[i][1], True, (255, 255, 255))
+            score = arial.render(str(leaderboard[i][2]), True, (255, 255, 255))
 
             self.screen.blit(place, (x + 30, y + 35 + i * 30))
             self.screen.blit(username, (x + 55, y + 35 + i * 30))
@@ -411,12 +416,7 @@ class Engine:
 
 
     def game_loop(self):
-        global IMAGE_HEADING, IMAGE_BLACK_PAWN, IMAGE_WHITE_PAWN, game, mark_pawns, lose, win
-
-        if DAME_TEXTURES:
-            IMAGE_HEADING = pygame.image.load(IMAGE_BASE_DIR + 'heading_dame.png')
-            IMAGE_BLACK_PAWN = pygame.image.load(IMAGE_BASE_DIR + 'pawn_dame_black.png')
-            IMAGE_WHITE_PAWN = pygame.image.load(IMAGE_BASE_DIR + 'pawn_dame_white.png')
+        global game, mark_pawns, lose, win
 
         self.draw_loading()
         pygame.display.flip()
