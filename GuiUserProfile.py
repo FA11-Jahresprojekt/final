@@ -46,7 +46,7 @@ class GuiUserProfile:
 
                 # on Quit
                 if event.type == pygame.QUIT:
-                    running = False
+                    self.running = False
 
                 # On Click
                 elif event.type == pygame.MOUSEBUTTONDOWN:
@@ -134,9 +134,9 @@ class GuiUserProfile:
         elif self.difficulty == -1:
             games_summary_player = self.db.getGameHistoryForChosenPlayerFiltered(self.player_id, self.game_type)
         elif self.game_type == '-1':
-            games_summary_player = self.db.getGameHistoryForChosenPlayerFiltered(self.player_id, None, self.difficulty)
+            games_summary_player = self.db.getGameHistoryForChosenPlayerFiltered(self.player_id, None, self.difficulty + 1)
         else:
-            games_summary_player = self.db.getGameHistoryForChosenPlayerFiltered(self.player_id, self.game_type, self.difficulty)
+            games_summary_player = self.db.getGameHistoryForChosenPlayerFiltered(self.player_id, self.game_type, self.difficulty + 1)
 
         return games_summary_player
 

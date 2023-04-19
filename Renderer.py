@@ -17,7 +17,7 @@ class Renderer:
         self.button_quad_selected_image = pygame.image.load(Variables.DIR_IMAGES + "button_quad_selected.png")
         self.background_image = pygame.image.load(Variables.DIR_IMAGES + "background.png")
         self.user_image = pygame.image.load(Variables.DIR_IMAGES + "profile_default.png")
-        self.user_image_200x200 = pygame.image.load(Variables.DIR_IMAGES + "profile_default-2.png")
+        self.user_image_200x200 = pygame.transform.scale(self.user_image, (200, 200))
         self.undo_image = pygame.image.load(Variables.DIR_IMAGES + "undo_button.png")
         self.button_wide_image = pygame.image.load(Variables.DIR_IMAGES + "button_wide.png")
         self.button_image = pygame.image.load(Variables.DIR_IMAGES + "button.png")
@@ -286,7 +286,7 @@ class Renderer:
             pygame.draw.rect(self.screen, COLOR_BLACK90, (x - 5, y - 5, width - 30, 75))
 
             self.draw_text(gameName, 26, COLOR_WHITE, x + 20, y + 10)
-            self.draw_text("Difficulty: " + str(difficulty), 22, COLOR_WHITE, x + 20, y + 40)
+            self.draw_text("Difficulty: " + str(difficulty + 1), 22, COLOR_WHITE, x + 20, y + 40)
             self.draw_text("Outcome: " + outcome, 22, COLOR_WHITE, x + width - 300, y + 10)
             self.draw_text("Destroyed Pawns: " + str(destroyedPawns), 22, COLOR_WHITE, x + width - 300, y + 40)
             y += 80

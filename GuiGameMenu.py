@@ -5,6 +5,7 @@ import Util
 import Variables
 from Database import Database
 from Renderer import Renderer
+from engine import Engine
 
 pygame.init()
 
@@ -72,11 +73,17 @@ class GuiGameMenu:
             self.guiFrom.run()
             self.running = False
 
+        if name == "play":
+            Engine(self.screen, self, self.difficulty - 1, self.gameName).game_loop()
+            self.running = False
+
+
     def draw_menu(self):
         self.buttons.clear()
         self.renderer.draw_background()
 
         headerBtns = self.renderer.draw_heading(self.gameName, Variables.getPlayerName(), True, True)
+
         self.buttons = Util.append_array_to_array(self.buttons, headerBtns)
 
         dButtons = self.renderer.draw_game_preview(self.headerImage, self.gameImage, 80, 160, self.difficulty, 400, 275)
