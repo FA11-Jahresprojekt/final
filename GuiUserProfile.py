@@ -33,8 +33,8 @@ class GuiUserProfile:
         self.difficulty = 3
         self.game_type = '-1'
 
-        self.username = Variables.PLAYER_ID['name']
-        self.player_id = Variables.PLAYER_ID['id']
+        self.username = Variables.getPlayerName()
+        self.player_id = Variables.getPlayerId()
 
     def runUserProfile(self):
 
