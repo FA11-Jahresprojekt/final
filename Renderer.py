@@ -286,7 +286,7 @@ class Renderer:
             pygame.draw.rect(self.screen, COLOR_BLACK90, (x - 5, y - 5, width - 30, 75))
 
             self.draw_text(gameName, 26, COLOR_WHITE, x + 20, y + 10)
-            self.draw_text("Difficulty: " + str(difficulty), 22, COLOR_WHITE, x + 20, y + 40)
+            self.draw_text("Difficulty: " + str(difficulty + 1), 22, COLOR_WHITE, x + 20, y + 40)
             self.draw_text("Outcome: " + outcome, 22, COLOR_WHITE, x + width - 300, y + 10)
             self.draw_text("Destroyed Pawns: " + str(destroyedPawns), 22, COLOR_WHITE, x + width - 300, y + 40)
             y += 80
