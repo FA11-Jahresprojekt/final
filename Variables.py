@@ -16,3 +16,9 @@ DAME_TITLE = "Dame"
 
 # PLAYER ID
 PLAYER_ID = None # {'id': 1, 'name': 'Test'} # {'id': <id>, 'name': <name>}
+
+def getPlayerId():
+    return PLAYER_ID['id']
+
+def getPlayerName():
+    return PLAYER_ID['name']
