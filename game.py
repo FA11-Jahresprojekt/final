@@ -6,6 +6,7 @@ from abc import ABC
 from typing import Optional
 from random import randint
 
+import Variables
 from minimax import minimax
 
 from Database import Database
@@ -196,8 +197,8 @@ class BauernSchach(Game, ABC):
     def checkIfWon(self, player) -> bool:
         for pawn in self.gameField.getPawnsForPlayerKey(player):
             if pawn is not None and pawn.posY == (self.gameField.getSize() - 1 if player == "B" else 0):
-                # TODO: PlayerID
-                Database.getInstance().registerNewGame(-1, "Bauernschach", self.difficultly,
+                if Variables.getPlayerId() != -1:
+                    Database.getInstance().registerNewGame(Variables.getPlayerId(), "Bauernschach", self.difficultly,
                                                        "won" if player == "A" else "lost",
                                                        self.gameField.destoryedPawns['A'])
                 return True
@@ -208,8 +209,8 @@ class BauernSchach(Game, ABC):
         lost = len(self.getPossiblePawnsForPlayer(player)) == 0
 
         if lost:
-            # TODO: PlayerID
-            Database.getInstance().registerNewGame(-1, "Bauernschach", self.difficultly,
+                if Variables.getPlayerId() != -1:
+                    Database.getInstance().registerNewGame(Variables.getPlayerId(), "Bauernschach", self.difficultly,
                                                    "lost" if player == "A" else "won", self.gameField.destoryedPawns['A'])
 
         return lost
@@ -280,10 +281,21 @@ class Dame(Game, ABC):
     def checkIfWon(self, player) -> bool:
         for pawn in self.gameField.getPawnsForPlayerKey(player):
             if pawn is not None and pawn.posY == (self.gameField.getSize() - 1 if player == "B" else 0):
+                if Variables.getPlayerId() != -1:
+                    Database.getInstance().registerNewGame(Variables.getPlayerId(), "Dame", self.difficultly,
+                                                       "won" if player == "A" else "lost",
+                                                       self.gameField.destoryedPawns['A'])
                 return True
 
     def checkIfLose(self, player: str) -> bool:
-        return len(self.getPossiblePawnsForPlayer(player)) == 0
+
+        lost = len(self.getPossiblePawnsForPlayer(player)) == 0
+
+        if lost:
+                if Variables.getPlayerId() != -1:
+                    Database.getInstance().registerNewGame(Variables.getPlayerId(), "Dame", self.difficultly,
+                                                   "lost" if player == "A" else "won", self.gameField.destoryedPawns['A'])
+        return lost
 
     def getPossiblePawnDestinationsForChosenPawn(self, pawn: Pawn, recursiveMove=False) -> []:
         lineCoord = pawn.posY
