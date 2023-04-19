@@ -68,7 +68,7 @@ class GuiGameMenu:
             self.running = False
 
         if name == "play":
-            Engine(self, self.difficulty, self.gameName).game_loop()
+            Engine(self.screen, self, self.difficulty - 1, self.gameName).game_loop()
             self.running = False
 
 

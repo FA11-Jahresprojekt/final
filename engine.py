@@ -46,18 +46,13 @@ IMAGE_GAME_BACKGROUND = pygame.image.load(IMAGE_BASE_DIR + 'game_background.png'
 IMAGE_STATS_BACKGROUND = pygame.image.load(IMAGE_BASE_DIR + 'stats_background.png')
 IMAGE_LEADERBOARD_BACKGROUND = pygame.image.load(IMAGE_BASE_DIR + 'leaderboard_background.png')
 
-# Setting up the window
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.DOUBLEBUF)
-pygame.display.set_caption(TITLE)
-pygame.display.set_icon(IMAGE_FAVICON)
-
 # Variables
 selected_pawn = []
 mark_pawns = []
 disable_deselect = False
 
 class Engine:
-    def __init__(self, mainMenu, difficulty, game):
+    def __init__(self, screen, mainMenu, difficulty, game):
         if game == 'Bauernschach':
             self.game = BauernSchach(difficulty)
             DAME_TEXTURES = False
@@ -67,17 +62,21 @@ class Engine:
 
         if difficulty == 0:
             self.ki = RandomKi(self.game)
+            print("KI: RandomKi" + str(difficulty))
         else:
             self.ki = MiniMaxKI(self.game)
+            print("KI: MiniMax" + str(difficulty))
 
+        self.screen = screen
         self.mainMenu = mainMenu
+        self.running = True
         self.quit = False
 
     def draw_heading(self):
         leftover = SCREEN_HEIGHT - (COLUMNS * SQUARE_SIZE)
         offset = 15
 
-        screen.blit(pygame.transform.scale(IMAGE_HEADING, (420, 46)), (PADDING - offset, leftover / 2 - offset))
+        self.screen.blit(pygame.transform.scale(IMAGE_HEADING, (420, 46)), (PADDING - offset, leftover / 2 - offset))
 
 
     def draw_pawn(self, xField, yField, color):
@@ -87,9 +86,9 @@ class Engine:
         y = yField * SQUARE_SIZE + leftover / 2 + PADDING
 
         if color == "white":
-            screen.blit(IMAGE_WHITE_PAWN, (x, y))
+            self.screen.blit(IMAGE_WHITE_PAWN, (x, y))
         elif color == "black":
-            screen.blit(IMAGE_BLACK_PAWN, (x, y))
+            self.screen.blit(IMAGE_BLACK_PAWN, (x, y))
 
 
     def draw_help_button(self):
@@ -97,7 +96,7 @@ class Engine:
         x = PADDING + 380
         y = ROWS * SQUARE_SIZE + leftover / 2 + PADDING + 20
 
-        help = screen.blit(IMAGE_ICON_HELP, (x, y))
+        help = self.screen.blit(IMAGE_ICON_HELP, (x, y))
 
         if help.collidepoint(pygame.mouse.get_pos()):
             minus_padding = (420 - SQUARE_SIZE * ROWS) / 2
@@ -105,11 +104,11 @@ class Engine:
             x = (SCREEN_WIDTH - 560) - PADDING / 2
             y = leftover / 2 + PADDING
 
-            screen.blit(IMAGE_LEADERBOARD_BACKGROUND, (x - minus_padding, y - minus_padding))
+            self.screen.blit(IMAGE_LEADERBOARD_BACKGROUND, (x - minus_padding, y - minus_padding))
 
             for i in range(len(HELP_TEXT)):
                 helpText = arial.render(HELP_TEXT[i], True, (255, 255, 255))
-                screen.blit(helpText, (x + 20, y + 20 + i * 30))
+                self.screen.blit(helpText, (x + 20, y + 20 + i * 30))
 
 
     def draw_quit_button(self):
@@ -117,11 +116,11 @@ class Engine:
         x = PADDING + 380
         y = ROWS * SQUARE_SIZE + leftover / 2 + PADDING + 20
 
-        quitButton = screen.blit(IMAGE_ICON_EXIT, (x - 30, y))
+        quitButton = self.screen.blit(IMAGE_ICON_EXIT, (x - 30, y))
 
         if quitButton.collidepoint(pygame.mouse.get_pos()):
             if pygame.mouse.get_pressed()[0]:
-                quit = True
+                self.quit = True
                 mixer.music.play()
 
 
@@ -148,11 +147,11 @@ class Engine:
 
 
     def draw_button(self, x, y, text, width=150, height=50):
-        image = screen.blit(pygame.transform.scale(IMAGE_BUTTON, (width, height)), (x, y))
+        image = self.screen.blit(pygame.transform.scale(IMAGE_BUTTON, (width, height)), (x, y))
         buttonText = arial.render(text, True, (255, 255, 255))
         text_width, text_height = arial.size(text)
 
-        screen.blit(buttonText, (x + width / 2 - text_width / 2, y + height / 2 - text_height / 2))
+        self.screen.blit(buttonText, (x + width / 2 - text_width / 2, y + height / 2 - text_height / 2))
         return image
 
 
@@ -167,13 +166,13 @@ class Engine:
             return
 
         self.draw_background()
-        screen.blit(IMAGE_LOSE_LABEL, (SCREEN_WIDTH / 2 - 486 / 2, SCREEN_HEIGHT / 4))
+        self.screen.blit(IMAGE_LOSE_LABEL, (SCREEN_WIDTH / 2 - 486 / 2, SCREEN_HEIGHT / 4))
 
-        screen.blit(pygame.transform.scale(IMAGE_STATS_BACKGROUND, (300, 80)),
+        self.screen.blit(pygame.transform.scale(IMAGE_STATS_BACKGROUND, (300, 80)),
                     (SCREEN_WIDTH / 2 - 300 / 2, SCREEN_HEIGHT / 4 + 100))
 
         scoreText = arial.render("Destroyed Pawns: " + str(score), True, (255, 255, 255))
-        screen.blit(scoreText, (SCREEN_WIDTH / 2 - 300 / 2 + 35, SCREEN_HEIGHT / 4 + 125))
+        self.screen.blit(scoreText, (SCREEN_WIDTH / 2 - 300 / 2 + 35, SCREEN_HEIGHT / 4 + 125))
 
         quitBtn = self.draw_button(SCREEN_WIDTH / 2 - 500 / 2, SCREEN_HEIGHT / 2 - 67 / 2 + 150, "Spiel beenden", 500, 67)
 
@@ -193,13 +192,13 @@ class Engine:
             return
 
         self.draw_background()
-        screen.blit(IMAGE_WIN_LABEL, (SCREEN_WIDTH / 2 - 497 / 2, SCREEN_HEIGHT / 4))
+        self.screen.blit(IMAGE_WIN_LABEL, (SCREEN_WIDTH / 2 - 497 / 2, SCREEN_HEIGHT / 4))
 
-        screen.blit(pygame.transform.scale(IMAGE_STATS_BACKGROUND, (300, 80)),
+        self.screen.blit(pygame.transform.scale(IMAGE_STATS_BACKGROUND, (300, 80)),
                     (SCREEN_WIDTH / 2 - 300 / 2, SCREEN_HEIGHT / 4 + 100))
 
         scoreText = arial.render("Destroyed Pawns: " + str(score), True, (255, 255, 255))
-        screen.blit(scoreText, (SCREEN_WIDTH / 2 - 300 / 2 + 35, SCREEN_HEIGHT / 4 + 125))
+        self.screen.blit(scoreText, (SCREEN_WIDTH / 2 - 300 / 2 + 35, SCREEN_HEIGHT / 4 + 125))
 
         quitBtn = self.draw_button(SCREEN_WIDTH / 2 - 500 / 2, SCREEN_HEIGHT / 2 - 67 / 2 + 150, "Spiel beenden", 500, 67)
 
@@ -209,7 +208,7 @@ class Engine:
 
     def back_to_main(self):
         self.mainMenu.run()
-
+        self.running = False
 
     def truncline(self, text, font, maxwidth):
         real = len(text)
@@ -252,7 +251,7 @@ class Engine:
         dark_color = (114, 74, 44)
 
         minus_padding = (420 - SQUARE_SIZE * ROWS) / 2
-        screen.blit(IMAGE_GAME_BACKGROUND, (PADDING - minus_padding, leftover / 2 + PADDING - minus_padding))
+        self.screen.blit(IMAGE_GAME_BACKGROUND, (PADDING - minus_padding, leftover / 2 + PADDING - minus_padding))
 
         for row in range(ROWS):
             for column in range(COLUMNS):
@@ -264,18 +263,18 @@ class Engine:
                 else:
                     color = dark_color
 
-                if pygame.draw.rect(screen, color, (x, y, SQUARE_SIZE, SQUARE_SIZE)).collidepoint(pygame.mouse.get_pos()):
-                    self.draw_rect_alpha(screen, (0, 0, 0, 20), (x, y, SQUARE_SIZE, SQUARE_SIZE))
+                if pygame.draw.rect(self.screen, color, (x, y, SQUARE_SIZE, SQUARE_SIZE)).collidepoint(pygame.mouse.get_pos()):
+                    self.draw_rect_alpha(self.screen, (0, 0, 0, 20), (x, y, SQUARE_SIZE, SQUARE_SIZE))
 
                     if pygame.mouse.get_pressed()[0]:
-                        self.draw_rect_alpha(screen, (0, 0, 0, 50), (x, y, SQUARE_SIZE, SQUARE_SIZE))
+                        self.draw_rect_alpha(self.screen, (0, 0, 0, 50), (x, y, SQUARE_SIZE, SQUARE_SIZE))
                         self.on_click(column, row)
 
                 if [column, row] in mark_pawns:
-                    self.draw_rect_alpha(screen, (0, 100, 0, 60), (x, y, SQUARE_SIZE, SQUARE_SIZE))
+                    self.draw_rect_alpha(self.screen, (0, 100, 0, 60), (x, y, SQUARE_SIZE, SQUARE_SIZE))
 
                 if selected_pawn == [column, row]:
-                    self.draw_rect_alpha(screen, (0, 0, 0, 80), (x, y, SQUARE_SIZE, SQUARE_SIZE))
+                    self.draw_rect_alpha(self.screen, (0, 0, 0, 80), (x, y, SQUARE_SIZE, SQUARE_SIZE))
 
 
     def draw_difficulty(self):
@@ -285,7 +284,7 @@ class Engine:
 
         difficulty = arialBold.render("Schwierigkeit: Einfach", True, (255, 255, 255))
 
-        screen.blit(difficulty, (x, y))
+        self.screen.blit(difficulty, (x, y))
 
 
     def on_click(self, column, row):
@@ -364,7 +363,7 @@ class Engine:
         x = (SCREEN_WIDTH - 560) - PADDING / 2
         y = leftover / 2 + PADDING
 
-        screen.blit(IMAGE_LEADERBOARD_BACKGROUND, (x - minus_padding, y - minus_padding))
+        self.screen.blit(IMAGE_LEADERBOARD_BACKGROUND, (x - minus_padding, y - minus_padding))
 
         leaderboard = self.get_leaderboard()
 
@@ -376,9 +375,9 @@ class Engine:
             username = arialBold.render(leaderboard[i]["username"], True, (255, 255, 255))
             score = arial.render(str(leaderboard[i]["score"]), True, (255, 255, 255))
 
-            screen.blit(place, (x + 30, y + 35 + i * 30))
-            screen.blit(username, (x + 55, y + 35 + i * 30))
-            screen.blit(score, (x + 30 + 400, y + 35 + i * 30))
+            self.screen.blit(place, (x + 30, y + 35 + i * 30))
+            self.screen.blit(username, (x + 55, y + 35 + i * 30))
+            self.screen.blit(score, (x + 30 + 400, y + 35 + i * 30))
 
 
     def draw_stats(self):
@@ -392,23 +391,23 @@ class Engine:
         x = (SCREEN_WIDTH - 560) - PADDING / 2
         y = leftover / 2 + PADDING
 
-        screen.blit(IMAGE_STATS_BACKGROUND, (x - minus_padding, y - minus_padding - 150))
+        self.screen.blit(IMAGE_STATS_BACKGROUND, (x - minus_padding, y - minus_padding - 150))
 
         scoreText = arial.render("Score: " + str(score), True, (255, 255, 255))
-        screen.blit(scoreText, (x + 35, y - 110))
+        self.screen.blit(scoreText, (x + 35, y - 110))
 
 
     def draw_background(self):
-        screen.blit(IMAGE_BACKGROUND, (0, 0))
+        self.screen.blit(IMAGE_BACKGROUND, (0, 0))
 
 
     def draw_loading(self):
-        screen.blit(IMAGE_BACKGROUND, (0, 0))
-        screen.blit(IMAGE_HEADING_GRUPPE, (SCREEN_WIDTH / 2 - 228, SCREEN_HEIGHT / 2 - 37.5))
+        self.screen.blit(IMAGE_BACKGROUND, (0, 0))
+        self.screen.blit(IMAGE_HEADING_GRUPPE, (SCREEN_WIDTH / 2 - 228, SCREEN_HEIGHT / 2 - 37.5))
 
 
     def draw_text(self, text, x, y, color):
-        screen.blit(arial.render(text, True, color), (x, y))
+        self.screen.blit(arial.render(text, True, color), (x, y))
 
 
     def game_loop(self):
@@ -429,9 +428,7 @@ class Engine:
         self.draw_difficulty()
         pygame.display.update()
 
-        running = True
-
-        while running:
+        while self.running:
 
             if self.game.currentPlayer == "A":
                 if self.game.checkIfLose("A"):
@@ -470,6 +467,6 @@ class Engine:
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    running = False
+                    self.running = False
 
         pygame.quit()
