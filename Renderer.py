@@ -17,7 +17,7 @@ class Renderer:
         self.button_quad_selected_image = pygame.image.load(Variables.DIR_IMAGES + "button_quad_selected.png")
         self.background_image = pygame.image.load(Variables.DIR_IMAGES + "background.png")
         self.user_image = pygame.image.load(Variables.DIR_IMAGES + "profile_default.png")
-        self.user_image_200x200 = pygame.image.load(Variables.DIR_IMAGES + "profile_default-2.png")
+        self.user_image_200x200 = pygame.transform.scale(self.user_image, (200, 200))
         self.undo_image = pygame.image.load(Variables.DIR_IMAGES + "undo_button.png")
         self.button_wide_image = pygame.image.load(Variables.DIR_IMAGES + "button_wide.png")
         self.button_image = pygame.image.load(Variables.DIR_IMAGES + "button.png")
