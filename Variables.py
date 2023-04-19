@@ -15,4 +15,4 @@ CHESS_TITLE = "Chess"
 DAME_TITLE = "Dame"
 
 # PLAYER ID
-PLAYER_ID = None # {'id': <id>, 'name': <name>}
+PLAYER_ID = None # {'id': 1, 'name': 'Test'} # {'id': <id>, 'name': <name>}

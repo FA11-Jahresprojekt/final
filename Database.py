@@ -167,6 +167,44 @@ class Database:
         self.__connection.commit()
         return self.__cursor.fetchall()
 
+    def getGameHistoryForChosenPlayerFiltered(self, playerID, gameName=None, difficulty=None):
+        """
+        get the game-history for a chosen Player, filtered by gameName and difficulty
+        getGameHistoryForChosenPlayerFiltered(playerID) will return the full list of games for the chosen player.
+        getGameHistoryForChosenPlayerFiltered(playerID, gameName) will return the list of games for the chosen player with the given gameName.
+        getGameHistoryForChosenPlayerFiltered(playerID, None, difficulty) will return the list of games for the chosen player with the given difficulty.
+        getGameHistoryForChosenPlayerFiltered(playerID, gameName, difficulty) will return the list of games for the chosen player with the given gameName and difficulty.
+        Args:
+            playerID (int): int representing the primary key of the chosen player
+            gameName (str): (optional) the game name to filter for
+            difficulty (int): (optional) the difficulty to filter for
+        Returns:
+            list: Lists filled with:
+                    gameName (str),
+                    difficulty (int),
+                    outcome (str),
+                    destroyedPawns (int)
+        """
+
+        games = self.getGameHistoryForChosenPlayer(playerID)
+        filteredGames = []
+        if gameName is not None and difficulty is not None:
+            for game in games:
+                if game[0] == gameName and game[1] == difficulty:
+                    filteredGames.append(game)
+        elif gameName is not None:
+            for game in games:
+                if game[0] == gameName:
+                    filteredGames.append(game)
+        elif difficulty is not None:
+            for game in games:
+                if game[1] == difficulty:
+                    filteredGames.append(game)
+        else:
+            filteredGames = games
+
+        return filteredGames
+
     def registerNewPerson(self, userName, password):
         """Adds a new set of data representing
 

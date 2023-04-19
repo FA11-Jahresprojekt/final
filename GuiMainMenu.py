@@ -8,6 +8,7 @@ import Variables
 from Database import Database
 from GuiGameMenu import GuiGameMenu
 from GuiLogin import GuiLogin
+from GuiUserProfile import GuiUserProfile
 from Renderer import Renderer
 
 pygame.init()
@@ -85,6 +86,11 @@ class GuiMainMenu:
         if name == "btn.bauernschach":
             GuiGameMenu(self, SCREEN, BAUERNSCHACH_HEADER_IMAGE, BAUERNSCHACH_IMAGE, "Bauernschach").run()
             self.running = False
+
+        if name == "profile":
+            GuiUserProfile().runUserProfile()
+            self.running = False
+
 
         if name == "logout":
             Variables.PLAYER_ID = None
