@@ -23,14 +23,15 @@ pygame.display.set_icon(pygame.image.load(Variables.DIR_IMAGES + "favicon.png"))
 
 
 class GuiUserProfile:
-    def __init__(self):
+    def __init__(self, guiFrom):
         self.running = True
         self.db = Database.getInstance()
         self.renderer = Renderer(SCREEN)
+        self.guiFrom = guiFrom
 
         self.buttons = []
         self.difficulty = 3
-        self.game_type = 'Bauernschach'
+        self.game_type = '-1'
 
         self.username = Variables.PLAYER_ID['name']
         self.player_id = Variables.PLAYER_ID['id']
@@ -52,6 +53,8 @@ class GuiUserProfile:
 
                     # inside button bounds
                     for button in self.buttons:
+                        # print(self.buttons)
+                        # print(button)
                         if button['rect'].collidepoint(pygame.mouse.get_pos()):
                             self.onClick(button['name'])
 
@@ -94,7 +97,7 @@ class GuiUserProfile:
             print('dame selected')
 
         if buttonName == "back":
-            # self.guiFrom.run()
+            self.guiFrom.run()
             self.running = False
 
 
@@ -107,7 +110,7 @@ class GuiUserProfile:
 
         # Header
         backBtn = self.renderer.draw_heading("Mein Profil", self.username, True, False)
-        self.buttons.append({'name': 'back', 'rect': backBtn})
+        self.buttons = Util.append_array_to_array(self.buttons, backBtn)
 
         # Profile
         user_image_rect = self.renderer.draw_user_profile_image_and_name(160, 120, self.username)
@@ -116,7 +119,7 @@ class GuiUserProfile:
         self.buttons = Util.append_array_to_array(self.buttons, difficulty_buttons)
 
         self.drawGameSelection()
-        self.drawPlayerGameHistory(0, 0)
+        self.drawPlayerGameHistory()
 
         # Game History
 
@@ -168,7 +171,7 @@ class GuiUserProfile:
         self.buttons.append({'rect': button_dame, 'name': 'dame_selected'})
 
 
-    def drawPlayerGameHistory(self, game_type, difficulty):
+    def drawPlayerGameHistory(self):
         # stuff (160, 340, 760, 260)
         games_summary_player = self.getGameHistory()
         self.renderer.drawGameHistory(160, 340, 760, 260, games_summary_player)

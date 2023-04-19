@@ -32,6 +32,7 @@ class GuiGameMenu:
         self.running = True
 
         self.buttons = []
+        print(f'init buttons: {self.buttons}')
 
         self.difficulty = 3
 
@@ -68,15 +69,14 @@ class GuiGameMenu:
     def draw_menu(self):
         self.buttons.clear()
         self.renderer.draw_background()
-        headerBtns = self.renderer.draw_heading(self.gameName, Variables.PLAYER_ID['name'], True)
 
+        headerBtns = self.renderer.draw_heding(self.gameName, Variables.PLAYER_ID['name'], True, True)
         self.buttons = Util.append_array_to_array(self.buttons, headerBtns)
 
         dButtons = self.renderer.draw_game_preview(self.headerImage, self.gameImage, 80, 160, self.difficulty, 400, 275)
-
         self.buttons = Util.append_array_to_array(self.buttons, dButtons)
-        self.draw_scores()
 
+        self.draw_scores()
         pygame.display.update()
 
     def draw_scores(self):

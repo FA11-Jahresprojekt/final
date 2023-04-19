@@ -64,13 +64,15 @@ class Renderer:
             size = 87
             selected = i == difficulty - 1
             button = self.draw_quad_button(x + widthX + 40 + i * (size + 10), y + 42, size, size, str(i + 1), selected, 50)
-            buttons.append({'rect': button, 'name': 'difficulty_' + str(i + 1)})
+            button_rect = pygame.Rect(button.x, button.y, button.width, button.height)
+            buttons.append({'rect': button_rect, 'name': 'difficulty_' + str(i + 1)})
 
         button = self.screen.blit(pygame.transform.scale(self.button_image, (920, 123)), (x, Variables.SCREEN_HEIGHT - 150))
+        button_rect = pygame.Rect(button.x, button.y, button.width, button.height)
         label = self.get_font(45).render("SPIELEN", True, COLOR_WHITE)
         self.screen.blit(label, (x + (920 / 2) - (label.get_width() / 2), Variables.SCREEN_HEIGHT - 150 + (123 / 2) - (label.get_height() / 2)))
 
-        buttons.append({'rect': button, 'name': 'play'})
+        buttons.append({'rect': button_rect, 'name': 'play'})
 
         return buttons
 
@@ -141,18 +143,22 @@ class Renderer:
         pygame.Surface.fill(self.screen, COLOR_BLACK80, rect=(0, 60, 1080, 3))
 
         if show_user:
-            self.draw_user(username, Variables.SCREEN_WIDTH - 20, 16)
+            user_rect = self.draw_user(username, Variables.SCREEN_WIDTH - 20, 16)
+            user_button_dic = {'rect': user_rect, 'name': 'profile'}
+            buttons.append(user_button_dic)
 
         heading = self.get_font(26, True).render(header, True, COLOR_WHITE)
-
         add = 0
-        backBtn = None
+
         if back:
             add = 40
             backBtn = self.screen.blit(pygame.transform.scale(self.undo_image, (20, 20)), (25, 21))
+            back_button_rect = pygame.Rect(20, 20, 25, 21)
+            backBtn_dic = {'rect': back_button_rect, 'name': 'back'}
+            buttons.append(backBtn_dic)
 
         self.screen.blit(heading, (20 + add, 16))
-        return backBtn
+        return buttons
 
     def draw_highscore_list(self, game, header_image, x, y):
         width = 240

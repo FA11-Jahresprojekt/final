@@ -88,11 +88,11 @@ class GuiMainMenu:
             self.running = False
 
         if name == "profile":
-            GuiUserProfile().runUserProfile()
-            self.running = False
+            if Variables.PLAYER_ID != -1:
+                GuiUserProfile(self).runUserProfile()
+                self.running = False
 
-
-        if name == "logout":
+        if name == "back":
             Variables.PLAYER_ID = None
             self.gui_login.runLoginScreen()
             self.running = False
@@ -112,12 +112,14 @@ class GuiMainMenu:
                 self.dame_difficulty = difficulty
                 self.draw_highscores()
 
+
     def draw_menu(self):
 
         self.renderer.draw_background()
-        headerBtns = self.renderer.draw_heading("Spielesammlung", Variables.PLAYER_ID['name'])
+        headerBtns = self.renderer.draw_heading("Spielesammlung", Variables.PLAYER_ID['name'], True, True)
 
-        self.buttons = Util.append_array_to_array(self.buttons, headerBtns)
+        if headerBtns is not None:
+            self.buttons = Util.append_array_to_array(self.buttons, headerBtns)
 
         buttonBauernschach = self.renderer.draw_game_card(BAUERNSCHACH_HEADER_IMAGE, BAUERNSCHACH_IMAGE, 80, 160)
         buttonDame = self.renderer.draw_game_card(DAME_HEADER_IMAGE, DAME_IMAGE, 80, 420)
