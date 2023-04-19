@@ -27,15 +27,15 @@ class GuiGameMenu:
 
         self.headerImage = headerImage
         self.gameImage = gameImage
-        self.gameName = gameName
         self.guiFrom = guiFrom
 
         self.running = True
+        self.player_id = Variables.getPlayerId()
 
         self.buttons = []
-        print(f'init buttons: {self.buttons}')
 
         self.difficulty = 3
+        self.gameName = gameName
 
     def run(self):
         clock.tick(60)
@@ -55,7 +55,13 @@ class GuiGameMenu:
         mixer.music.play()
 
         if "difficulty" in name:
-            self.difficulty = int(name.split("_")[1])
+            difficulty = int(name.split("_")[1])
+
+            if difficulty == self.difficulty:
+                self.difficulty = -1
+            else:
+                self.difficulty = difficulty
+
             self.draw_menu()
 
         if name == "logout":
@@ -76,7 +82,8 @@ class GuiGameMenu:
         self.buttons.clear()
         self.renderer.draw_background()
 
-        headerBtns = self.renderer.draw_heading(self.gameName, Variables.PLAYER_ID['name'], True, True)
+        headerBtns = self.renderer.draw_heading(self.gameName, Variables.getPlayerName(), True, True)
+
         self.buttons = Util.append_array_to_array(self.buttons, headerBtns)
 
         dButtons = self.renderer.draw_game_preview(self.headerImage, self.gameImage, 80, 160, self.difficulty, 400, 275)
@@ -85,18 +92,36 @@ class GuiGameMenu:
         self.draw_scores()
         pygame.display.update()
 
+    def getGameHistory(self):
+
+        # if difficulty is not selected
+        if self.difficulty == -1:
+            games_summary_player = self.db.getGameHistoryForChosenPlayerFiltered(self.player_id, self.gameName)
+        else:
+            games_summary_player = self.db.getGameHistoryForChosenPlayerFiltered(self.player_id, self.gameName, self.difficulty)
+
+        return games_summary_player
+
     def draw_scores(self):
         x = 80
         y = 160
         widthX = 400
-
         size = 87
 
-        self.renderer.draw_score_card(x + widthX + 40, y + 150, size, size, "PLAYED GAMES", "0")
-        self.renderer.draw_score_card(x + widthX + 40 + (size + 10), y + 150, size, size, "WON GAMES", "0")
-        self.renderer.draw_score_card(x + widthX + 40 + (size + 10) * 2, y + 150, size, size, "LOST GAMES", "0")
-        self.renderer.draw_score_card(x + widthX + 40 + (size + 10) * 3, y + 150, size, size, "CANCELLED GAMES", "0")
-        self.renderer.draw_score_card(x + widthX + 40 + (size + 10) * 4, y + 150, size, size, "DESTROYED PAWNS", "0")
+        games_summary_player = self.getGameHistory()
+
+        # calculate stats based on game history
+        total_games_played = len(games_summary_player)
+        total_games_won = sum(1 for game in games_summary_player if game[2] == "won")
+        total_games_lost = sum(1 for game in games_summary_player if game[2] == "lost")
+        total_games_canceled = sum(1 for game in games_summary_player if game[2] == "cancelled")
+        total_pawns_destroyed = sum(game[3] for game in games_summary_player)
+
+        self.renderer.draw_score_card(x + widthX + 40, y + 150, size, size, "PLAYED GAMES", total_games_played)
+        self.renderer.draw_score_card(x + widthX + 40 + (size + 10), y + 150, size, size, "WON GAMES", total_games_won)
+        self.renderer.draw_score_card(x + widthX + 40 + (size + 10) * 2, y + 150, size, size, "LOST GAMES", total_games_lost)
+        self.renderer.draw_score_card(x + widthX + 40 + (size + 10) * 3, y + 150, size, size, "CANCELLED GAMES", total_games_canceled)
+        self.renderer.draw_score_card(x + widthX + 40 + (size + 10) * 4, y + 150, size, size, "DESTROYED PAWNS", total_pawns_destroyed)
 
     def getOwnScore(self, gameName, difficulty, playerID):
         ownScore = self.db.getGamesSummaryForGameAndDifficultyAndPlayerID(gameName, difficulty, playerID)

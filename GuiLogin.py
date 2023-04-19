@@ -144,8 +144,6 @@ class GuiLogin:
                                                     self.db.registerNewPerson(self.username, Util.hash_password(self.password))
 
                                                     Variables.PLAYER_ID = {'id': self.db.getPersonByUserName(self.username)[0][0], 'name': self.username}
-                                                    playerIDCache = Variables.PLAYER_ID['id']
-                                                    userNameCache = self.username
                                                     self.mainMenu.run()
                                                     self.running = False
                                                 else:
@@ -181,9 +179,7 @@ class GuiLogin:
 
                                 # guest login
                                 if button['name'] == 'GUEST':
-                                    playerIDCache = -1
                                     Variables.PLAYER_ID = {'id': -1, 'name': 'Gast'}
-                                    userNameCache = "Gast"
                                     self.mainMenu.run()
                                     self.running = False
 

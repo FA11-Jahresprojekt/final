@@ -95,7 +95,7 @@ class Renderer:
             self.screen.blit(title_text, (x + (width / 2) - (title_text.get_width() / 2) + 2, y + (height - 18) -
                                           (title_text.get_height() / 2) - 10 * (len(texts) - 1) + 13 * i))
 
-        value_text = self.get_font(value_font_size, True).render(value, True, COLOR_WHITE)
+        value_text = self.get_font(value_font_size, True).render(str(value), True, COLOR_WHITE)
         self.screen.blit(value_text, (x + (width / 2) - (value_text.get_width() / 2) + 3, y + (height / 2) - (value_text.get_height() / 2) - 8))
 
         return pygame.Rect(x, y, width, height)

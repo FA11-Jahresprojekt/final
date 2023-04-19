@@ -88,9 +88,12 @@ class GuiMainMenu:
             self.running = False
 
         if name == "profile":
-            if Variables.PLAYER_ID != -1:
+            if Variables.getPlayerId() != -1:
+                print(Variables.PLAYER_ID)
                 GuiUserProfile(self).runUserProfile()
                 self.running = False
+            else:
+                print('guest tries to access profile')
 
         if name == "back":
             Variables.PLAYER_ID = None
@@ -116,7 +119,7 @@ class GuiMainMenu:
     def draw_menu(self):
 
         self.renderer.draw_background()
-        headerBtns = self.renderer.draw_heading("Spielesammlung", Variables.PLAYER_ID['name'], True, True)
+        headerBtns = self.renderer.draw_heading("Spielesammlung", Variables.getPlayerName(), True, True)
 
         if headerBtns is not None:
             self.buttons = Util.append_array_to_array(self.buttons, headerBtns)
