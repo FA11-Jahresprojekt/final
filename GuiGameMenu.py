@@ -32,7 +32,6 @@ class GuiGameMenu:
         self.player_id = Variables.getPlayerId()
 
         self.buttons = []
-        print(f'init buttons: {self.buttons}')
 
         self.difficulty = 3
         self.gameName = gameName
@@ -55,7 +54,13 @@ class GuiGameMenu:
         mixer.music.play()
 
         if "difficulty" in name:
-            self.difficulty = int(name.split("_")[1])
+            difficulty = int(name.split("_")[1])
+
+            if difficulty == self.difficulty:
+                self.difficulty = -1
+            else:
+                self.difficulty = difficulty
+
             self.draw_menu()
 
         if name == "logout":
@@ -82,7 +87,7 @@ class GuiGameMenu:
 
     def getGameHistory(self):
 
-        # get stats for game_type and difficulty
+        # if difficulty is not selected
         if self.difficulty == -1:
             games_summary_player = self.db.getGameHistoryForChosenPlayerFiltered(self.player_id, self.gameName)
         else:

@@ -88,9 +88,12 @@ class GuiMainMenu:
             self.running = False
 
         if name == "profile":
-            if Variables.PLAYER_ID != -1:
+            if Variables.getPlayerId() != -1:
+                print(Variables.PLAYER_ID)
                 GuiUserProfile(self).runUserProfile()
                 self.running = False
+            else:
+                print('guest tries to access profile')
 
         if name == "back":
             Variables.PLAYER_ID = None
